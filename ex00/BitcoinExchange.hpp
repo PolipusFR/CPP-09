@@ -19,6 +19,16 @@
 #define YEAR_POS 0
 #define MONTH_POS 5
 #define DAY_POS 8
+#define MIN_MONTH 1
+#define MAX_MONTH 12
+#define MIN_DAY 1
+#define MAX_DAY 31
+#define MAX_DAY_SHORT 30
+#define FEBRUARY 2
+#define APRIL 4
+#define JUNE 6
+#define SEPTEMBER 9
+#define NOVEMBER 11
 
 
 class BitcoinExchange
