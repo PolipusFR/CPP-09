@@ -1,16 +1,16 @@
 SRC				+=	main.cpp\
-					BitcoinExchange.cpp\
+					RPN.cpp\
 					
 
 ########################################################################################################################
 #                                                     --VARIABLE--                                                     #
 ########################################################################################################################
-HEAD			+=  BitcoinExchange.hpp\
+HEAD			+=  RPN.hpp\
 
 OBJS_D			:=	objs/
 OBJS			:=	$(addprefix $(OBJS_D),$(SRC:%.cpp=%.o))
 
-NAME			:=	btc
+NAME			:=	RPN
 
 
 RM				:=	rm -rf
@@ -25,9 +25,9 @@ all				:	$(NAME)
 
 $(NAME)			:	$(OBJS_D) $(OBJS)
 					@echo "${I_MAG}'OBJECTS'\t: ${GREEN} done ✅ ${RESET}\n"
-					@echo "${I_MAG}'btc'\t\t: ${RED} Work In Progress ◌ ${RESET}"
+					@echo "${I_MAG}'RPN'\t\t: ${RED} Work In Progress ◌ ${RESET}"
 					$(CC) $(CFLAGS) -o $(NAME) $(OBJS)
-					@echo "${I_MAG}'btc'\t\t: ${GREEN} done ✅ ${RESET}\n"
+					@echo "${I_MAG}'RPN'\t\t: ${GREEN} done ✅ ${RESET}\n"
 					@echo "${RESET}";
 
 $(OBJS_D)%.o	:	%.cpp $(HEAD)
@@ -42,7 +42,7 @@ clean			:
 					$(RM) $(OBJS) $(OBJS_D)
 
 fclean			:	clean
-					@echo "${I_MAG}'btc'\t\t: ${RED} deleted ❌ ${RESET}\n"
+					@echo "${I_MAG}'RPN'\t\t: ${RED} deleted ❌ ${RESET}\n"
 					$(RM) $(NAME)
 
 re				:	fclean all
