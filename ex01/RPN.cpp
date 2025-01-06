@@ -16,7 +16,7 @@ RPN &RPN::operator=(const RPN &other)
 
 double RPN::processExpression(const std::string &expression)
 {
-    //verifyExpression(expression);
+    verifyExpression(expression);
     for (size_t i = 0; i < expression.size(); i++)
     {
         if (expression[i] == ' ')
@@ -48,16 +48,42 @@ bool RPN::isOperator(char c)
 double RPN::processOperation(double a, double b, char op)
 {
     if (op == '+')
-        return a + b;
+        return b + a;
     else if (op == '-')
-        return a - b;
+        return b - a;
     else if (op == '*')
-        return a * b;
+        return b * a;
     else if (op == '/')
     {
         if (b == 0)
             throw std::invalid_argument("Error: Impossible division by zero");
-        return a / b;
+        return b / a;
     }
     throw std::invalid_argument("Error: Invalid operator");
+}
+
+void RPN::verifyExpression(const std::string &expression)
+{
+    if (expression.empty())
+        throw std::invalid_argument("Error: Empty expression");
+    if (expression[0] == ' ' || expression[expression.size() - 1] == ' ')
+        throw std::invalid_argument("Error: Invalid expression");
+    int operators = 0;
+    int operands = 0;
+    int space = 0;
+    for (size_t i = 0; i < expression.size(); i++)
+    {
+        if (expression[i] == ' ')
+            space++;
+        else if (std::isdigit(expression[i]))
+            operands++;
+        else if (isOperator(expression[i]))
+            operators++;
+        else
+            throw std::invalid_argument("Error: Invalid expression");
+    }
+    if (space != operators + operands - 1)
+        throw std::invalid_argument("Error: Invalid expression");
+    if (operands != operators + 1 || operators == 0)
+        throw std::invalid_argument("Error: Invalid expression");
 }

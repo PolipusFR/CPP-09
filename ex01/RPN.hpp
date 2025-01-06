@@ -23,7 +23,7 @@ class RPN
         double processExpression(const std::string &expression);
         bool isOperator(char c);
         double processOperation(double a, double b, char op);
-        double getResult();
+        void verifyExpression(const std::string &expression);
 };
 
 #endif
