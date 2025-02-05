@@ -19,22 +19,21 @@ class PmergeMe
         PmergeMe &operator=(const PmergeMe &other);
         PmergeMe (char **list);
 
-        void parse();
-        void sorting();
+        void parse(char **list);
+
+        std::vector<int> fordJohnsonSortVec(std::vector<int> vec);
+        std::deque<int> fordJohnsonSortDeq(std::deque<int> deq);
+        std::vector<int> generateInsertionOrder(int pend_size);
+        std::vector<int> generateJacobsthal(int n);
+        
         void sortVec(int begin, int end);
         void sortDeq(int begin, int end);
 
-        void mergeVec(int begin, int middle, int end);
-        void mergeDeq(int begin, int middle, int end);
-        void insertVec(int begin, int end);
-        void insertDeq(int begin, int end);
-
         void printVec();
         void printDeq();
-        void printList();
+        void printList(char **list);
 
     private:
-        char **_list;
         std::vector<int> _vec;
         std::deque<int> _deq;
 };

@@ -14,66 +14,16 @@ PmergeMe &PmergeMe::operator=(const PmergeMe &other) {
     return *this;
 }
 
-PmergeMe::PmergeMe(char **list) : _list(list)
-{
-    parse();
-    sorting();
-    return;
-}
+PmergeMe::PmergeMe(char **list) {
+    parse(list);
+    fordJohnsonSortVec(_vec);
+    fordJohnsonSortDeq(_deq);
 
-void PmergeMe::printVec() {
-    for (std::vector<int>::iterator it = _vec.begin(); it != _vec.end(); it++) {
-        std::cout << *it << " ";
-    }
-    std::cout << std::endl;
-}
-
-void PmergeMe::printDeq() {
-    for (std::deque<int>::iterator it = _deq.begin(); it != _deq.end(); it++) {
-        std::cout << *it << " ";
-    }
-    std::cout << std::endl;
-}
-
-void PmergeMe::printList() {
-    int i = 1;
-    while (_list[i]) {
-        std::cout << _list[i] << " ";
-        i++;
-    }
-    std::cout << std::endl;
-}	
-
-void PmergeMe::parse()
-{
-    int i,j;
-
-    i = 1;
-    while (_list[i])
-    {
-        j = 0;
-        while (_list[i][j])
-        {
-            if (!isdigit(_list[i][j]))
-            {
-                std::cerr << "Error: Negative number or non digit detected." << std::endl;
-                exit(1);
-            }
-            j++;
-        }
-        _vec.push_back(atoi(_list[i]));
-        _deq.push_back(atoi(_list[i]));
-        i++;
-    }
-}
-
-void PmergeMe::sorting()
-{
-    clock_t start, end;
+        clock_t start, end;
     double time_vec, time_deq;
 
     std::cout << "Before: " << std::endl;
-    printList(); 
+    printList(list); 
     start = clock();
     sortVec(0, _vec.size() - 1);
     end = clock();
@@ -90,127 +40,175 @@ void PmergeMe::sorting()
 
     std::cout << "Time to process a range of " << _vec.size() << " elements with std::vector is: " << time_vec << " µs" << std::endl;
     std::cout << "Time to process a range of " << _deq.size() << " elements with std::deque is: " << time_deq << " µs" << std::endl;
-
-    return;
 }
 
-void PmergeMe::mergeVec(int begin, int middle, int end)
-{
-    std::vector<int> left(_vec.begin() + begin, _vec.begin() + middle + 1);
-    std::vector<int> right(_vec.begin() + middle + 1, _vec.begin() + end + 1);
-    size_t left_i = 0;
-    size_t right_i = 0;
+void PmergeMe::printList(char **list) {
+    int i = 1;
+    while (list[i]) {
+        std::cout << list[i] << " ";
+        i++;
+    }
+    std::cout << std::endl;
+}	
 
-    for (int i = begin; i <= end; i++)
-    {
-        if (right_i == right.size())
-        {
-            _vec[i] = left[left_i];
-            left_i++;
-        }
-        else if (left_i == left.size())
-        {
-            _vec[i] = right[right_i];
-            right_i++;
-        }
-        else if (left[left_i] < right[right_i])
-        {
-            _vec[i] = left[left_i];
-            left_i++;
-        }
-        else
-        {
-            _vec[i] = right[right_i];
-            right_i++;
-        }
-    } 
 
+void PmergeMe::printVec() {
+    for (std::vector<int>::iterator it = _vec.begin(); it != _vec.end(); it++) {
+        std::cout << *it << " ";
+    }
+    std::cout << std::endl;
 }
 
-void PmergeMe::mergeDeq(int begin, int middle, int end)
-{
-    std::deque<int> left(_deq.begin() + begin, _deq.begin() + middle + 1);
-    std::deque<int> right(_deq.begin() + middle + 1, _deq.begin() + end + 1);
-    size_t left_i = 0;
-    size_t right_i = 0;
+void PmergeMe::printDeq() {
+    for (std::deque<int>::iterator it = _deq.begin(); it != _deq.end(); it++) {
+        std::cout << *it << " ";
+    }
+    std::cout << std::endl;
+}
 
-    for (int i = begin; i <= end; i++)
+void PmergeMe::parse(char **list)
+{
+    int i,j;
+
+    i = 1;
+    while (list[i])
     {
-        if (right_i == right.size())
+        j = 0;
+        while (list[i][j])
         {
-            _deq[i] = left[left_i];
-            left_i++;
+            if (!isdigit(list[i][j]))
+            {
+                std::cerr << "Error: Negative number or non digit detected." << std::endl;
+                exit(1);
+            }
+            j++;
         }
-        else if (left_i == left.size())
-        {
-            _deq[i] = right[right_i];
-            right_i++;
-        }
-        else if (left[left_i] < right[right_i])
-        {
-            _deq[i] = left[left_i];
-            left_i++;
-        }
-        else
-        {
-            _deq[i] = right[right_i];
-            right_i++;
-        }
+        _vec.push_back(atoi(list[i]));
+        _deq.push_back(atoi(list[i]));
+        i++;
     }
 }
+// Tri Ford-Johnson pour std::vector
+std::vector<int> PmergeMe::fordJohnsonSortVec(std::vector<int> vec) {
+    if (vec.size() <= 1) return vec;
 
-void PmergeMe::insertVec(int begin, int end)
-{
-    for (int i = begin; i < end; i++)
-    {
-        int temp = _vec[i + 1];
-        int j = i + 1;
-        while (j > begin && _vec[j - 1] > temp)
-        {
-            _vec[j] = _vec[j - 1];
-            j--;
+    bool has_straggler = vec.size() % 2;
+    size_t num_pairs = vec.size() / 2;
+
+    // Créer des paires et trier par élément max
+    std::vector<std::pair<int, int> > pairs;
+    for (size_t i = 0; i < num_pairs; ++i) {
+        int a = vec[2*i], b = vec[2*i + 1];
+        if (a < b) std::swap(a, b);
+        pairs.push_back(std::make_pair(a, b));
+    }
+    std::sort(pairs.begin(), pairs.end(), std::less<std::pair<int, int> >()); // Tri ascendant
+
+    // Extraire les éléments principaux (max) et pendulaires (min)
+    std::vector<int> main_chain, pend;
+    for (size_t i = 0; i < pairs.size(); ++i) {
+        main_chain.push_back(pairs[i].first);
+        pend.push_back(pairs[i].second);
+    }
+    if (has_straggler) pend.push_back(vec.back());
+
+    // Trier récursivement la chaîne principale
+    main_chain = fordJohnsonSortVec(main_chain);
+
+    // Insérer les éléments pendulaires selon Jacobsthal
+    std::vector<int> order = generateInsertionOrder(pend.size());
+    for (size_t i = 0; i < order.size(); ++i) {
+        int val = pend[order[i]];
+        std::vector<int>::iterator pos = std::lower_bound(main_chain.begin(), main_chain.end(), val);
+        main_chain.insert(pos, val);
+    }
+
+    return main_chain;
+}
+
+// Tri Ford-Johnson pour std::deque (similaire)
+std::deque<int> PmergeMe::fordJohnsonSortDeq(std::deque<int> deq) {
+    if (deq.size() <= 1) return deq;
+
+    bool has_straggler = deq.size() % 2;
+    size_t num_pairs = deq.size() / 2;
+
+    std::vector<std::pair<int, int> > pairs;
+    for (size_t i = 0; i < num_pairs; ++i) {
+        int a = deq[2*i], b = deq[2*i + 1];
+        if (a < b) std::swap(a, b);
+        pairs.push_back(std::make_pair(a, b));
+    }
+    std::sort(pairs.begin(), pairs.end(), std::greater<std::pair<int, int> >());
+
+    std::deque<int> main_chain, pend;
+    for (size_t i = 0; i < pairs.size(); ++i) {
+        main_chain.push_back(pairs[i].first);
+        pend.push_back(pairs[i].second);
+    }
+    if (has_straggler) pend.push_back(deq.back());
+
+    main_chain = fordJohnsonSortDeq(main_chain);
+
+    std::vector<int> order = generateInsertionOrder(pend.size());
+    for (size_t i = 0; i < order.size(); ++i) {
+        int val = pend[order[i]];
+        std::deque<int>::iterator pos = std::lower_bound(main_chain.begin(), main_chain.end(), val);
+        main_chain.insert(pos, val);
+    }
+
+    return main_chain;
+}
+
+// Générer l'ordre d'insertion Jacobsthal
+std::vector<int> PmergeMe::generateInsertionOrder(int pend_size) {
+    std::vector<int> order;
+    if (pend_size == 0) return order;
+
+    std::vector<int> jacob = generateJacobsthal(pend_size);
+    order.push_back(0);
+    if (pend_size >= 2) order.push_back(1);
+
+    for (size_t k = 2; k < jacob.size(); ++k) {
+        int start = jacob[k-1] + 1;
+        int end = std::min(jacob[k], pend_size - 1);
+        for (int i = end; i >= start; --i) {
+            order.push_back(i);
+            if ((int)order.size() == pend_size) break;
         }
-        _vec[j] = temp;
+        if ((int)order.size() == pend_size) break;
     }
+
+    return order;
 }
 
-void PmergeMe::insertDeq(int begin, int end)
-{
-    for (int i = begin; i < end; i++)
-    {
-        int temp = _deq[i + 1];
-        int j = i + 1;
-        while (j > begin && _deq[j - 1] > temp)
-        {
-            _deq[j] = _deq[j - 1];
-            j--;
-        }
-        _deq[j] = temp;
-    }
+// Générer la séquence de Jacobsthal
+std::vector<int> PmergeMe::generateJacobsthal(int n) {
+    std::vector<int> jacob;
+    if (n >= 0) jacob.push_back(0);
+    if (n >= 1) jacob.push_back(1);
+
+    int next;
+    do {
+        next = jacob.back() + 2 * jacob[jacob.size() - 2];
+        jacob.push_back(next);
+    } while (next <= n);
+
+    return jacob;
 }
 
-void PmergeMe::sortVec(int begin, int end)
-{
-    if (end - begin > 5)
-    {
-        int middle = (begin + end) / 2;
-        sortVec(begin, middle);
-        sortVec(middle + 1, end);
-        mergeVec(begin, middle, end);
-    }
-    else
-        insertVec(begin, end);
+// Tri du vecteur
+void PmergeMe::sortVec(int begin, int end) {
+    std::vector<int> sub(_vec.begin() + begin, _vec.begin() + end + 1);
+    std::vector<int> sorted = fordJohnsonSortVec(sub);
+    for (size_t i = 0; i < sorted.size(); ++i)
+        _vec[begin + i] = sorted[i];
 }
 
-void PmergeMe::sortDeq(int begin, int end)
-{
-    if (end - begin > 5)
-    {
-        int middle = (begin + end) / 2;
-        sortDeq(begin, middle);
-        sortDeq(middle + 1, end);
-        mergeDeq(begin, middle, end);
-    }
-    else
-        insertDeq(begin, end);
+// Tri de la deque
+void PmergeMe::sortDeq(int begin, int end) {
+    std::deque<int> sub(_deq.begin() + begin, _deq.begin() + end + 1);
+    std::deque<int> sorted = fordJohnsonSortDeq(sub);
+    for (size_t i = 0; i < sorted.size(); ++i)
+        _deq[begin + i] = sorted[i];
 }
