@@ -90,14 +90,16 @@ void PmergeMe::parse(char **list)
 std::vector<int> PmergeMe::fordJohnsonSortVec(std::vector<int> vec) {
     if (vec.size() <= 1)
         return vec;
-    bool has_straggler = vec.size() % 2;
+    bool is_odd = vec.size() % 2;
     size_t num_pairs = vec.size() / 2;
     // Créer des paires et trier par élément max
     std::vector<std::pair<int, int> > pairs;
     for (size_t i = 0; i < num_pairs; ++i)
     {
-        int a = vec[2*i], b = vec[2*i + 1];
-        if (a < b) std::swap(a, b);
+        int a = vec[2*i];
+        int b = vec[2*i + 1];
+        if (a < b)
+            std::swap(a, b);
         pairs.push_back(std::make_pair(a, b));
     }
     std::sort(pairs.begin(), pairs.end(), std::less<std::pair<int, int> >()); // Tri ascendant
@@ -108,7 +110,7 @@ std::vector<int> PmergeMe::fordJohnsonSortVec(std::vector<int> vec) {
         main_chain.push_back(pairs[i].first);
         pend.push_back(pairs[i].second);
     }
-    if (has_straggler)
+    if (is_odd)
         pend.push_back(vec.back());
     // Trier récursivement la chaîne principale
     main_chain = fordJohnsonSortVec(main_chain);
@@ -126,7 +128,7 @@ std::vector<int> PmergeMe::fordJohnsonSortVec(std::vector<int> vec) {
 std::deque<int> PmergeMe::fordJohnsonSortDeq(std::deque<int> deq) {
     if (deq.size() <= 1)
         return deq;
-    bool has_straggler = deq.size() % 2;
+    bool is_odd = deq.size() % 2;
     size_t num_pairs = deq.size() / 2;
     std::deque<std::pair<int, int> > pairs;
     for (size_t i = 0; i < num_pairs; ++i) {
@@ -141,7 +143,7 @@ std::deque<int> PmergeMe::fordJohnsonSortDeq(std::deque<int> deq) {
         main_chain.push_back(pairs[i].first);
         pend.push_back(pairs[i].second);
     }
-    if (has_straggler)
+    if (is_odd)
         pend.push_back(deq.back());
     main_chain = fordJohnsonSortDeq(main_chain);
     std::deque<int> order = generateInsertionOrderDeq(pend.size());
