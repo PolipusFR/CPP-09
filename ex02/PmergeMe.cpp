@@ -92,7 +92,10 @@ std::vector<int> PmergeMe::fordJohnsonSortVec(std::vector<int> vec) {
         return vec;
     bool is_odd = vec.size() % 2;
     size_t num_pairs = vec.size() / 2;
-    // Créer des paires et trier par élément max
+    // 1) Regrouper les éléments de vec en vec.size()/2 paires
+    // Si vec a un nombre d elements impair, laisser 1 elem de cote
+    
+    // 2) Trier les paires avec le plus grand élément en premier
     std::vector<std::pair<int, int> > pairs;
     for (size_t i = 0; i < num_pairs; ++i)
     {
@@ -103,21 +106,19 @@ std::vector<int> PmergeMe::fordJohnsonSortVec(std::vector<int> vec) {
         pairs.push_back(std::make_pair(a, b));
     }
     std::sort(pairs.begin(), pairs.end(), std::less<std::pair<int, int> >()); // Tri ascendant
-    // Extraire les éléments principaux (max) et pendulaires (min)
-    std::vector<int> main_chain, pend;
+    std::vector<int> main_chain, sec_chain;
     for (size_t i = 0; i < pairs.size(); ++i)
     {
         main_chain.push_back(pairs[i].first);
-        pend.push_back(pairs[i].second);
+        sec_chain.push_back(pairs[i].second);
     }
     if (is_odd)
-        pend.push_back(vec.back());
+        sec_chain.push_back(vec.back());
     // Trier récursivement la chaîne principale
     main_chain = fordJohnsonSortVec(main_chain);
-    // Insérer les éléments pendulaires selon Jacobsthal
-    std::vector<int> order = generateInsertionOrder(pend.size());
+    std::vector<int> order = generateInsertionOrder(sec_chain.size());
     for (size_t i = 0; i < order.size(); ++i) {
-        int val = pend[order[i]];
+        int val = sec_chain[order[i]];
         std::vector<int>::iterator pos = std::lower_bound(main_chain.begin(), main_chain.end(), val);
         main_chain.insert(pos, val);
     }
@@ -132,24 +133,26 @@ std::deque<int> PmergeMe::fordJohnsonSortDeq(std::deque<int> deq) {
     size_t num_pairs = deq.size() / 2;
     std::deque<std::pair<int, int> > pairs;
     for (size_t i = 0; i < num_pairs; ++i) {
-        int a = deq[2*i], b = deq[2*i + 1];
-        if (a < b) std::swap(a, b);
+        int a = deq[2*i];
+        int b = deq[2*i + 1];
+        if (a < b)
+            std::swap(a, b);
         pairs.push_back(std::make_pair(a, b));
     }
     std::sort(pairs.begin(), pairs.end(), std::greater<std::pair<int, int> >());
-    std::deque<int> main_chain, pend;
+    std::deque<int> main_chain, sec_chain;
     for (size_t i = 0; i < pairs.size(); ++i)
     {
         main_chain.push_back(pairs[i].first);
-        pend.push_back(pairs[i].second);
+        sec_chain.push_back(pairs[i].second);
     }
     if (is_odd)
-        pend.push_back(deq.back());
+        sec_chain.push_back(deq.back());
     main_chain = fordJohnsonSortDeq(main_chain);
-    std::deque<int> order = generateInsertionOrderDeq(pend.size());
+    std::deque<int> order = generateInsertionOrderDeq(sec_chain.size());
     for (size_t i = 0; i < order.size(); ++i)
     {
-        int val = pend[order[i]];
+        int val = sec_chain[order[i]];
         std::deque<int>::iterator pos = std::lower_bound(main_chain.begin(), main_chain.end(), val);
         main_chain.insert(pos, val);
     }
@@ -157,50 +160,50 @@ std::deque<int> PmergeMe::fordJohnsonSortDeq(std::deque<int> deq) {
 }
 
 // Générer l'ordre d'insertion Jacobsthal
-std::vector<int> PmergeMe::generateInsertionOrder(int pend_size) {
+std::vector<int> PmergeMe::generateInsertionOrder(int sec_chain_size) {
     std::vector<int> order;
-    if (pend_size == 0)
+    if (sec_chain_size == 0)
         return order;
 
-    std::vector<int> jacob = generateJacobsthal(pend_size);
+    std::vector<int> jacob = generateJacobsthal(sec_chain_size);
     order.push_back(0);
-    if (pend_size >= 2)
+    if (sec_chain_size >= 2)
         order.push_back(1);
     for (size_t k = 2; k < jacob.size(); ++k)
     {
         int start = jacob[k-1] + 1;
-        int end = std::min(jacob[k], pend_size - 1);
+        int end = std::min(jacob[k], sec_chain_size - 1);
         for (int i = end; i >= start; --i)
         {
             order.push_back(i);
-            if ((int)order.size() == pend_size)
+            if ((int)order.size() == sec_chain_size)
                 break;
         }
-        if ((int)order.size() == pend_size)
+        if ((int)order.size() == sec_chain_size)
             break;
     }
     return order;
 }
 
-std::deque<int> PmergeMe::generateInsertionOrderDeq(int pend_size) {
+std::deque<int> PmergeMe::generateInsertionOrderDeq(int sec_chain_size) {
     std::deque<int> order;
-    if (pend_size == 0)
+    if (sec_chain_size == 0)
         return order;
-    std::deque<int> jacob = generateJacobsthalDeq(pend_size);
+    std::deque<int> jacob = generateJacobsthalDeq(sec_chain_size);
     order.push_back(0);
-    if (pend_size >= 2)
+    if (sec_chain_size >= 2)
         order.push_back(1);
     for (size_t k = 2; k < jacob.size(); ++k)
     {
         int start = jacob[k-1] + 1;
-        int end = std::min(jacob[k], pend_size - 1);
+        int end = std::min(jacob[k], sec_chain_size - 1);
         for (int i = end; i >= start; --i)
         {
             order.push_back(i);
-            if ((int)order.size() == pend_size)
+            if ((int)order.size() == sec_chain_size)
                 break;
         }
-        if ((int)order.size() == pend_size)
+        if ((int)order.size() == sec_chain_size)
             break;
     }
     return order;
