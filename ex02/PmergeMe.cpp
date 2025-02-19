@@ -16,10 +16,8 @@ PmergeMe &PmergeMe::operator=(const PmergeMe &other) {
 
 PmergeMe::PmergeMe(char **list) {
     parse(list);
-    fordJohnsonSortVec(_vec);
-    fordJohnsonSortDeq(_deq);
 
-        clock_t start, end;
+    clock_t start, end;
     double time_vec, time_deq;
 
     std::cout << "Before: " << std::endl;
@@ -90,31 +88,30 @@ void PmergeMe::parse(char **list)
 }
 // Tri Ford-Johnson pour std::vector
 std::vector<int> PmergeMe::fordJohnsonSortVec(std::vector<int> vec) {
-    if (vec.size() <= 1) return vec;
-
+    if (vec.size() <= 1)
+        return vec;
     bool has_straggler = vec.size() % 2;
     size_t num_pairs = vec.size() / 2;
-
     // Créer des paires et trier par élément max
     std::vector<std::pair<int, int> > pairs;
-    for (size_t i = 0; i < num_pairs; ++i) {
+    for (size_t i = 0; i < num_pairs; ++i)
+    {
         int a = vec[2*i], b = vec[2*i + 1];
         if (a < b) std::swap(a, b);
         pairs.push_back(std::make_pair(a, b));
     }
     std::sort(pairs.begin(), pairs.end(), std::less<std::pair<int, int> >()); // Tri ascendant
-
     // Extraire les éléments principaux (max) et pendulaires (min)
     std::vector<int> main_chain, pend;
-    for (size_t i = 0; i < pairs.size(); ++i) {
+    for (size_t i = 0; i < pairs.size(); ++i)
+    {
         main_chain.push_back(pairs[i].first);
         pend.push_back(pairs[i].second);
     }
-    if (has_straggler) pend.push_back(vec.back());
-
+    if (has_straggler)
+        pend.push_back(vec.back());
     // Trier récursivement la chaîne principale
     main_chain = fordJohnsonSortVec(main_chain);
-
     // Insérer les éléments pendulaires selon Jacobsthal
     std::vector<int> order = generateInsertionOrder(pend.size());
     for (size_t i = 0; i < order.size(); ++i) {
@@ -122,78 +119,121 @@ std::vector<int> PmergeMe::fordJohnsonSortVec(std::vector<int> vec) {
         std::vector<int>::iterator pos = std::lower_bound(main_chain.begin(), main_chain.end(), val);
         main_chain.insert(pos, val);
     }
-
     return main_chain;
 }
 
 // Tri Ford-Johnson pour std::deque (similaire)
 std::deque<int> PmergeMe::fordJohnsonSortDeq(std::deque<int> deq) {
-    if (deq.size() <= 1) return deq;
-
+    if (deq.size() <= 1)
+        return deq;
     bool has_straggler = deq.size() % 2;
     size_t num_pairs = deq.size() / 2;
-
-    std::vector<std::pair<int, int> > pairs;
+    std::deque<std::pair<int, int> > pairs;
     for (size_t i = 0; i < num_pairs; ++i) {
         int a = deq[2*i], b = deq[2*i + 1];
         if (a < b) std::swap(a, b);
         pairs.push_back(std::make_pair(a, b));
     }
     std::sort(pairs.begin(), pairs.end(), std::greater<std::pair<int, int> >());
-
     std::deque<int> main_chain, pend;
-    for (size_t i = 0; i < pairs.size(); ++i) {
+    for (size_t i = 0; i < pairs.size(); ++i)
+    {
         main_chain.push_back(pairs[i].first);
         pend.push_back(pairs[i].second);
     }
-    if (has_straggler) pend.push_back(deq.back());
-
+    if (has_straggler)
+        pend.push_back(deq.back());
     main_chain = fordJohnsonSortDeq(main_chain);
-
-    std::vector<int> order = generateInsertionOrder(pend.size());
-    for (size_t i = 0; i < order.size(); ++i) {
+    std::deque<int> order = generateInsertionOrderDeq(pend.size());
+    for (size_t i = 0; i < order.size(); ++i)
+    {
         int val = pend[order[i]];
         std::deque<int>::iterator pos = std::lower_bound(main_chain.begin(), main_chain.end(), val);
         main_chain.insert(pos, val);
     }
-
     return main_chain;
 }
 
 // Générer l'ordre d'insertion Jacobsthal
 std::vector<int> PmergeMe::generateInsertionOrder(int pend_size) {
     std::vector<int> order;
-    if (pend_size == 0) return order;
+    if (pend_size == 0)
+        return order;
 
     std::vector<int> jacob = generateJacobsthal(pend_size);
     order.push_back(0);
-    if (pend_size >= 2) order.push_back(1);
-
-    for (size_t k = 2; k < jacob.size(); ++k) {
+    if (pend_size >= 2)
+        order.push_back(1);
+    for (size_t k = 2; k < jacob.size(); ++k)
+    {
         int start = jacob[k-1] + 1;
         int end = std::min(jacob[k], pend_size - 1);
-        for (int i = end; i >= start; --i) {
+        for (int i = end; i >= start; --i)
+        {
             order.push_back(i);
-            if ((int)order.size() == pend_size) break;
+            if ((int)order.size() == pend_size)
+                break;
         }
-        if ((int)order.size() == pend_size) break;
+        if ((int)order.size() == pend_size)
+            break;
     }
+    return order;
+}
 
+std::deque<int> PmergeMe::generateInsertionOrderDeq(int pend_size) {
+    std::deque<int> order;
+    if (pend_size == 0)
+        return order;
+    std::deque<int> jacob = generateJacobsthalDeq(pend_size);
+    order.push_back(0);
+    if (pend_size >= 2)
+        order.push_back(1);
+    for (size_t k = 2; k < jacob.size(); ++k)
+    {
+        int start = jacob[k-1] + 1;
+        int end = std::min(jacob[k], pend_size - 1);
+        for (int i = end; i >= start; --i)
+        {
+            order.push_back(i);
+            if ((int)order.size() == pend_size)
+                break;
+        }
+        if ((int)order.size() == pend_size)
+            break;
+    }
     return order;
 }
 
 // Générer la séquence de Jacobsthal
-std::vector<int> PmergeMe::generateJacobsthal(int n) {
+std::vector<int> PmergeMe::generateJacobsthal(int n)
+{
     std::vector<int> jacob;
-    if (n >= 0) jacob.push_back(0);
-    if (n >= 1) jacob.push_back(1);
-
+    if (n >= 0)
+        jacob.push_back(0);
+    if (n >= 1)
+        jacob.push_back(1);
     int next;
-    do {
+    while (next <= n)
+    {
         next = jacob.back() + 2 * jacob[jacob.size() - 2];
         jacob.push_back(next);
-    } while (next <= n);
+    }
+    return jacob;
+}
 
+std::deque<int> PmergeMe::generateJacobsthalDeq(int n)
+{
+    std::deque<int> jacob;
+    if (n >= 0)
+        jacob.push_back(0);
+    if (n >= 1)
+        jacob.push_back(1);
+    int next;
+    while (next <= n)
+    {
+        next = jacob.back() + 2 * jacob[jacob.size() - 2];
+        jacob.push_back(next);
+    }
     return jacob;
 }
 
