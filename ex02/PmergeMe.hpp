@@ -21,18 +21,20 @@ class PmergeMe
 
         void parse(char **list);
 
-        std::vector<int> fordJohnsonSortVec(std::vector<int> vec);
-        std::deque<int> fordJohnsonSortDeq(std::deque<int> deq);
-        std::vector<int> generateInsertionOrder(int pend_size);
-        std::deque<int> generateInsertionOrderDeq(int pend_size);
-        std::vector<int> generateJacobsthal(int n);
-        std::deque<int> generateJacobsthalDeq(int n);
-        
-        void sortVec(int begin, int end);
-        void sortDeq(int begin, int end);
+        void ford_johnson_vec(std::vector<int>& v);
+        void merge_vec(std::vector<std::pair<int, int> >& pairs, int left, int mid, int right);
+        void sort_pairs_vec(std::vector<std::pair<int, int> >& pairs, int group_size);
+        std::vector<int> generate_jacobsthal_vec(int n);
+        int binary_search_vec(const std::vector<int>& main, int value);
 
-        void printVec();
+        void ford_johnson_deq(std::deque<int>& v);
+        void merge_deq(std::deque<std::pair<int, int> >& pairs, int left, int mid, int right);
+        void sort_pairs_deq(std::deque<std::pair<int, int> >& pairs, int group_size);
+        std::deque<int> generate_jacobsthal_deq(int n);
+        int binary_search_deq(const std::deque<int>& main, int value);
+
         void printDeq();
+        void printVec();
         void printList(char **list);
 
     private:

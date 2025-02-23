@@ -23,14 +23,14 @@ PmergeMe::PmergeMe(char **list) {
     std::cout << "Before: " << std::endl;
     printList(list); 
     start = clock();
-    sortVec(0, _vec.size() - 1);
+    ford_johnson_vec(_vec);
     end = clock();
     time_vec = (double)(end - start) / CLOCKS_PER_SEC;
     std::cout << "After; Vector: " << std::endl;
     printVec();
 
     start = clock();
-    sortDeq(0, _deq.size() - 1);
+    ford_johnson_deq(_deq);
     end = clock();
     time_deq = (double)(end - start) / CLOCKS_PER_SEC;
     std::cout << "After; Deque: " << std::endl;
@@ -71,24 +71,3 @@ void PmergeMe::parse(char **list)
         i++;
     }
 }
-
-// Implementation de recherche binaire si std::lower_bound ne convient pas au correcteur (remplacer vector par deque si besoin)
-
-// std::vector<int>::iterator binary_search_vector(std::vector<int>::iterator first, std::vector<int>::iterator last, const int& value) {
-//     std::vector<int>::iterator it;
-//     typename std::iterator_traits<std::vector<int>::iterator>::difference_type count, step;
-//     count = std::distance(first, last);
-
-//     while (count > 0) {
-//         it = first;
-//         step = count / 2;
-//         std::advance(it, step);
-//         if (*it < value) {
-//             first = ++it;
-//             count -= step + 1;
-//         } else {
-//             count = step;
-//         }
-//     }
-//     return first;
-// }
