@@ -71,3 +71,24 @@ void PmergeMe::parse(char **list)
         i++;
     }
 }
+
+// Implementation de recherche binaire si std::lower_bound ne convient pas au correcteur (remplacer vector par deque si besoin)
+
+// std::vector<int>::iterator binary_search_vector(std::vector<int>::iterator first, std::vector<int>::iterator last, const int& value) {
+//     std::vector<int>::iterator it;
+//     typename std::iterator_traits<std::vector<int>::iterator>::difference_type count, step;
+//     count = std::distance(first, last);
+
+//     while (count > 0) {
+//         it = first;
+//         step = count / 2;
+//         std::advance(it, step);
+//         if (*it < value) {
+//             first = ++it;
+//             count -= step + 1;
+//         } else {
+//             count = step;
+//         }
+//     }
+//     return first;
+// }

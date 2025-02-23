@@ -7,6 +7,13 @@ void PmergeMe::printVec() {
     std::cout << std::endl;
 }
 
+void printVector(const std::vector<int>& vec) {
+    for (size_t i = 0; i < vec.size(); ++i) {
+        std::cout << vec[i] << " ";
+    }
+    std::cout << std::endl;
+}
+
 // Tri Ford-Johnson pour std::vector
 std::vector<int> PmergeMe::fordJohnsonSortVec(std::vector<int> vec) {
     if (vec.size() <= 1)
@@ -36,6 +43,8 @@ std::vector<int> PmergeMe::fordJohnsonSortVec(std::vector<int> vec) {
     if (is_odd)
         sec_chain.push_back(vec.back());
     // 3) Trier récursivement les vec.size()/2 plus grands éléments de chaque paire
+    std::cout << "Main chain: ";
+    printVector(main_chain);
     main_chain = fordJohnsonSortVec(main_chain);
     // 4) Inserer dans main chain le reste des elements de sec chain
     std::vector<int> order = generateInsertionOrder(sec_chain.size());
