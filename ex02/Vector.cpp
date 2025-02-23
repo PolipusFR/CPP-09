@@ -90,7 +90,7 @@ std::vector<int> PmergeMe::generateJacobsthal(int n)
         jacob.push_back(0);
     if (n >= 1)
         jacob.push_back(1);
-    int next;
+    int next = 0;
     while (next <= n)
     {
         next = jacob.back() + 2 * jacob[jacob.size() - 2];
