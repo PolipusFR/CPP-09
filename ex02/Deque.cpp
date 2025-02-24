@@ -4,13 +4,12 @@
 #include <algorithm>
 
 void PmergeMe::printDeq() {
-    for (std::deque<int>::iterator it = _deq.begin(); it != _deq.end(); ++it) {
+    for (std::deque<int>::iterator it = _deq.begin(); it != _deq.end(); ++it)
         std::cout << *it << " ";
-    }
     std::cout << std::endl;
 }
 
-// Merge two sorted groups of pairs (sorted by their `a` values)
+// Merge two sorted groups of pairs (sorted by their highest values)
 void PmergeMe::merge_deq(std::deque<std::pair<int, int> >& pairs, int left, int mid, int right) {
     std::deque<std::pair<int, int> > temp;
     int i = left;
@@ -30,7 +29,7 @@ void PmergeMe::merge_deq(std::deque<std::pair<int, int> >& pairs, int left, int 
         pairs[left + k] = temp[k];
 }
 
-// Recursively sort pairs by `a` values
+// Recursively sort pairs by highest values
 void PmergeMe::sort_pairs_deq(std::deque<std::pair<int, int> >& pairs, int group_size) {
     if (group_size >= static_cast<int>(pairs.size()))
         return;
@@ -82,7 +81,7 @@ void PmergeMe::ford_johnson_deq(std::deque<int>& v) {
     if (has_odd)
         v.pop_back();
 
-    // Step 1: Form pairs and sort them by `a` values
+    // Step 1: Form pairs and sort them by `a`(higest) values
     std::deque<std::pair<int, int> > pairs;
     for (size_t i = 0; i < v.size(); i += 2)
     {
